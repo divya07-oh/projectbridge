@@ -50,7 +50,7 @@ export default function StudentDashboard() {
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">₹{stats.totalEarnings.toLocaleString()}</div>
+            <div className="text-2xl font-bold">₹{(stats?.totalEarnings || 0).toLocaleString()}</div>
             <p className="text-xs text-muted-foreground mt-1">+12% from last month</p>
           </CardContent>
         </Card>
@@ -60,7 +60,7 @@ export default function StudentDashboard() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.appliedProjects}</div>
+            <div className="text-2xl font-bold">{stats?.appliedProjects || 0}</div>
             <p className="text-xs text-muted-foreground mt-1">3 pending reviews</p>
           </CardContent>
         </Card>
@@ -70,7 +70,7 @@ export default function StudentDashboard() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.activeProjects}</div>
+            <div className="text-2xl font-bold">{stats?.activeProjects || 0}</div>
             <p className="text-xs text-muted-foreground mt-1">2 due this week</p>
           </CardContent>
         </Card>

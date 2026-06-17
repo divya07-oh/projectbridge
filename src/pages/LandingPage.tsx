@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -7,6 +8,24 @@ import { ArrowRight, CheckCircle2, Star, TrendingUp, Users, Briefcase, User } fr
 
 export default function LandingPage() {
   const featuredProjects = MOCK_PROJECTS.slice(0, 6);
+
+  const successStories = [
+    { name: "Priya Sharma", college: "Delhi University", skill: "UI/UX Designer", completed: 15, earned: "₹45,000", text: "ProjectNest helped me land my first client. I've now completed multiple projects and built a solid portfolio before graduating!" },
+    { name: "Rahul Verma", college: "IIT Bombay", skill: "Frontend Developer", completed: 8, earned: "₹60,000", text: "The businesses here understand we are students. It's the perfect environment to learn, make mistakes, and grow professionally." },
+    { name: "Sneha Reddy", college: "Christ University", skill: "Content Writer", completed: 12, earned: "₹25,000", text: "I easily found remote writing gigs that fit perfectly around my college schedule. The payment process is super smooth." },
+    { name: "Aditya Singh", college: "NIT Surathkal", skill: "Backend Developer", completed: 5, earned: "₹80,000", text: "Got to work on real scalable systems. The experience I gained here helped me crack my full-time placement interviews easily." },
+    { name: "Meera Patel", college: "NID Ahmedabad", skill: "Graphic Designer", completed: 22, earned: "₹55,000", text: "From logos to full brand identities, I found diverse clients. It gave me the creative freedom and financial independence I needed." },
+    { name: "Karan Gupta", college: "VIT Vellore", skill: "Data Analyst", completed: 7, earned: "₹35,000", text: "Helped startups make sense of their data. The platform's interface is seamless, and I love the direct communication with founders." }
+  ];
+
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % successStories.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [successStories.length]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -63,30 +82,38 @@ export default function LandingPage() {
       </section>
 
       {/* How it Works */}
-      <section className="py-24 px-4 bg-background">
+      <section className="py-24 px-4 bg-background overflow-hidden">
         <div className="container mx-auto max-w-5xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">How ProjectNest Works</h2>
+          <div className="text-center mb-20">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">How ProjectNest Works</h2>
             <p className="text-lg text-muted-foreground">Four simple steps to jumpstart your freelance career.</p>
           </div>
           
-          <div className="grid md:grid-cols-4 gap-8 relative">
-            <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-muted -z-10 -translate-y-1/2" />
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="hidden md:block absolute top-[45px] left-[10%] right-[10%] h-1 bg-gradient-to-r from-primary/10 via-primary/40 to-primary/10 -z-10" />
             
-            {[
-              { title: "Create Profile", icon: User, desc: "Showcase your skills, portfolio, and education." },
-              { title: "Apply Projects", icon: Briefcase, desc: "Browse and apply to projects that match your skills." },
-              { title: "Get Hired", icon: CheckCircle2, desc: "Interview with clients and get the project awarded." },
-              { title: "Earn Money", icon: TrendingUp, desc: "Deliver high-quality work and get paid securely." }
-            ].map((step, i) => (
-              <div key={i} className="flex flex-col items-center text-center bg-background">
-                <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 shadow-sm border border-primary/20">
-                  <step.icon className="h-8 w-8 text-primary" />
+            <div className="grid md:grid-cols-4 gap-12 md:gap-6 relative">
+              {[
+                { title: "Create Profile", icon: User, desc: "Showcase your skills, portfolio, and education.", step: "1" },
+                { title: "Browse Projects", icon: Briefcase, desc: "Search and filter projects that match your skills.", step: "2" },
+                { title: "Apply & Get Hired", icon: CheckCircle2, desc: "Submit proposals and interview with clients.", step: "3" },
+                { title: "Complete & Earn", icon: TrendingUp, desc: "Deliver high-quality work and get paid securely.", step: "4" }
+              ].map((step, i) => (
+                <div key={i} className="flex flex-col items-center text-center group cursor-default">
+                  <div className="relative mb-6">
+                    <div className="h-24 w-24 rounded-full bg-background border-4 border-muted/50 flex items-center justify-center shadow-sm group-hover:border-primary group-hover:shadow-primary/20 group-hover:-translate-y-2 transition-all duration-300 relative z-10">
+                      <step.icon className="h-10 w-10 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+                    </div>
+                    <div className="absolute -top-3 -right-3 h-8 w-8 rounded-full bg-primary text-primary-foreground font-bold flex items-center justify-center text-sm shadow-md group-hover:scale-110 transition-transform duration-300 z-20">
+                      {step.step}
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors duration-300">{step.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed max-w-[200px]">{step.desc}</p>
                 </div>
-                <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-                <p className="text-muted-foreground text-sm">{step.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -146,32 +173,55 @@ export default function LandingPage() {
             <p className="text-lg text-muted-foreground">Hear from students who kickstarted their careers here.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { name: "Priya Sharma", role: "UI/UX Designer", text: "ProjectNest helped me land my first client. I've now completed 5 projects and built a solid portfolio before graduating!" },
-              { name: "Rahul Verma", role: "Frontend Developer", text: "The businesses here understand we are students. It's the perfect environment to learn, make mistakes, and grow professionally." },
-              { name: "Sneha Reddy", role: "Content Writer", text: "I easily found remote writing gigs that fit perfectly around my college schedule. The payment process is super smooth." }
-            ].map((testimonial, i) => (
-              <Card key={i} className="bg-muted/10 border-none shadow-md">
-                <CardHeader>
-                  <div className="flex gap-1 text-amber-500 mb-4">
-                    {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}
-                  </div>
-                  <CardDescription className="text-base text-foreground italic">
-                    "{testimonial.text}"
-                  </CardDescription>
-                </CardHeader>
-                <CardFooter className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
+          <div className="relative max-w-4xl mx-auto overflow-hidden rounded-2xl bg-muted/10 p-6 md:p-12 shadow-inner border">
+            <div 
+              className="flex transition-transform duration-500 ease-in-out" 
+              style={{ transform: `translateX(-${currentTestimonial * 100}%)` }}
+            >
+              {successStories.map((testimonial, i) => (
+                <div key={i} className="min-w-full px-4 flex flex-col md:flex-row gap-8 items-center">
+                  <div className="w-32 h-32 md:w-48 md:h-48 shrink-0 rounded-full border-4 border-background shadow-lg overflow-hidden bg-primary/20 flex items-center justify-center text-4xl font-bold text-primary">
                     {testimonial.name[0]}
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-sm">{testimonial.name}</h4>
-                    <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                  <div className="flex-1 text-center md:text-left">
+                    <div className="flex justify-center md:justify-start gap-1 text-amber-500 mb-4">
+                      {[...Array(5)].map((_, i) => <Star key={i} className="h-5 w-5 fill-current" />)}
+                    </div>
+                    <blockquote className="text-xl md:text-2xl text-foreground font-medium italic mb-6 leading-relaxed">
+                      "{testimonial.text}"
+                    </blockquote>
+                    <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
+                      <div>
+                        <h4 className="font-bold text-lg">{testimonial.name}</h4>
+                        <p className="text-primary font-medium">{testimonial.skill}</p>
+                        <p className="text-sm text-muted-foreground">{testimonial.college}</p>
+                      </div>
+                      <div className="flex gap-4 justify-center md:justify-end text-sm">
+                        <div className="bg-background rounded-lg p-3 border shadow-sm text-center">
+                          <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Completed</p>
+                          <p className="font-bold">{testimonial.completed} Projects</p>
+                        </div>
+                        <div className="bg-background rounded-lg p-3 border shadow-sm text-center">
+                          <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">Earned</p>
+                          <p className="font-bold text-emerald-600">{testimonial.earned}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </CardFooter>
-              </Card>
-            ))}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-center gap-2 mt-8">
+              {successStories.map((_, i) => (
+                <button 
+                  key={i} 
+                  onClick={() => setCurrentTestimonial(i)}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${i === currentTestimonial ? 'w-8 bg-primary' : 'w-2.5 bg-primary/20 hover:bg-primary/40'}`}
+                  aria-label={`Go to slide ${i + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>

@@ -1,11 +1,11 @@
-import { Outlet, Link, useLocation } from "react-router-dom"
+import { Outlet, Link, useLocation, useNavigate, Navigate } from "react-router-dom"
 import { 
   Briefcase, 
   LayoutDashboard, 
   FolderGit2, 
   FileText, 
   MessageSquare, 
-  User, 
+  User as UserIcon, 
   Wallet, 
   Settings,
   Bell,
@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { MOCK_USER } from "@/data/mockData"
+import { useAppContext } from "@/context/AppContext"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,32 +25,44 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { toast } from "sonner"
+import NotificationDropdown from "@/components/shared/NotificationDropdown"
 
 export default function DashboardLayout() {
   const location = useLocation()
-  const isBusiness = location.pathname.startsWith('/business')
+  const navigate = useNavigate()
+  const { currentUser, setCurrentUser } = useAppContext()
+  const isBusiness = currentUser?.type === 'business'
 
   const studentLinks = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Projects", href: "/projects", icon: FolderGit2 },
-    { name: "Applications", href: "/applications", icon: FileText },
-    { name: "Messages", href: "/messages", icon: MessageSquare },
-    { name: "Profile", href: `/profile/me`, icon: User },
-    { name: "Earnings", href: "/earnings", icon: Wallet },
-    { name: "Reviews", href: "/reviews", icon: Star },
-    { name: "Settings", href: "#", icon: Settings },
+    { name: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
+    { name: "Find Work", href: "/student/find-work", icon: FolderGit2 },
+    { name: "Applications", href: "/student/applications", icon: FileText },
+    { name: "Messages", href: "/student/messages", icon: MessageSquare },
+    { name: "Profile", href: "/student/profile", icon: UserIcon },
+    { name: "Earnings", href: "/student/earnings", icon: Wallet },
+    { name: "Notifications", href: "/student/notifications", icon: Bell },
   ]
 
   const businessLinks = [
     { name: "Dashboard", href: "/business", icon: LayoutDashboard },
     { name: "Post Project", href: "/business/create-project", icon: PlusCircle },
-    { name: "Active Projects", href: "#", icon: FolderGit2 },
-    { name: "Applicants", href: "#", icon: Users },
-    { name: "Payments", href: "#", icon: Wallet },
-    { name: "Settings", href: "#", icon: Settings },
+    { name: "Active Projects", href: "/business/active", icon: FolderGit2 },
+    { name: "Applicants", href: "/business/applicants", icon: Users },
+    { name: "Payments", href: "/business/payments", icon: Wallet },
+    { name: "Messages", href: "/business/messages", icon: MessageSquare },
+    { name: "Profile", href: "/business/profile", icon: UserIcon },
   ]
 
   const links = isBusiness ? businessLinks : studentLinks
+
+  const handleLogout = () => {
+    setCurrentUser(null)
+    toast.success("Logged out successfully")
+    navigate("/")
+  }
+
+  if (!currentUser) return <Navigate to="/login" replace />;
 
   return (
     <div className="min-h-screen flex font-sans bg-muted/20">
@@ -86,11 +98,11 @@ export default function DashboardLayout() {
         <div className="p-4 border-t">
           <div className="flex items-center gap-3 px-3 py-2">
             <Avatar className="h-9 w-9">
-              <AvatarImage src={MOCK_USER.avatar} />
-              <AvatarFallback>AM</AvatarFallback>
+              <AvatarImage src={currentUser.avatar || `https://ui-avatars.com/api/?name=${currentUser.name}`} />
+              <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col overflow-hidden">
-              <span className="text-sm font-medium truncate">{MOCK_USER.name}</span>
+              <span className="text-sm font-medium truncate">{currentUser.name}</span>
               <span className="text-xs text-muted-foreground truncate">{isBusiness ? 'Business Account' : 'Student'}</span>
             </div>
           </div>
@@ -101,40 +113,35 @@ export default function DashboardLayout() {
       <main className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {/* Top Header */}
         <header className="h-16 border-b bg-background flex items-center justify-end px-6 gap-4 sticky top-0 z-10">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-2 right-2.5 h-2 w-2 rounded-full bg-destructive"></span>
-          </Button>
+          <NotificationDropdown />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={MOCK_USER.avatar} />
-                  <AvatarFallback>AM</AvatarFallback>
+                  <AvatarImage src={currentUser.avatar || `https://ui-avatars.com/api/?name=${currentUser.name}`} />
+                  <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{MOCK_USER.name}</p>
+                  <p className="text-sm font-medium leading-none">{currentUser.name}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    arjun@example.com
+                    {currentUser.email}
                   </p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
+              <DropdownMenuItem asChild>
+                <Link to={isBusiness ? "/business/profile" : "/student/profile"}>
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
@@ -152,3 +159,4 @@ export default function DashboardLayout() {
     </div>
   )
 }
+

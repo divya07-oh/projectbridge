@@ -78,7 +78,7 @@ export default function ReviewsPage() {
           <h3 className="font-bold text-xl mb-4 flex items-center gap-2">Client Feedback ({MOCK_REVIEWS.length})</h3>
           
           <div className="space-y-4">
-            {MOCK_REVIEWS.map((review) => (
+            {MOCK_REVIEWS.map((review: any) => (
               <Card key={review.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">

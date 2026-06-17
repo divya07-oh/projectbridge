@@ -48,7 +48,7 @@ export default function EarningsPage() {
             <Wallet className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-primary">₹{MOCK_USER.stats.totalEarnings.toLocaleString()}</div>
+            <div className="text-3xl font-bold text-primary">₹{(MOCK_USER.stats.totalEarnings || 0).toLocaleString()}</div>
             <p className="text-xs text-muted-foreground mt-1">Lifetime revenue</p>
           </CardContent>
         </Card>
