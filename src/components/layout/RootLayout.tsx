@@ -16,15 +16,12 @@ export default function RootLayout() {
           </Link>
           
           <nav className="hidden md:flex gap-6 text-sm font-medium">
-            <Link to="/projects" className="text-muted-foreground hover:text-foreground transition-colors">
-              Find Work
-            </Link>
-            <Link to="#" className="text-muted-foreground hover:text-foreground transition-colors">
-              How it works
-            </Link>
-            <Link to="#" className="text-muted-foreground hover:text-foreground transition-colors">
+            <a href="/#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
+              How It Works
+            </a>
+            <a href="/#success-stories" className="text-muted-foreground hover:text-foreground transition-colors">
               Success Stories
-            </Link>
+            </a>
           </nav>
 
           <div className="flex items-center gap-4">

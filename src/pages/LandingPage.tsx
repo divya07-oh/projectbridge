@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { MOCK_PROJECTS } from "@/data/mockData"
-import { ArrowRight, CheckCircle2, Star, TrendingUp, Users, Briefcase, User } from "lucide-react"
+import { ArrowRight, CheckCircle2, Star, TrendingUp, Users, Briefcase, User, ChevronLeft, ChevronRight } from "lucide-react"
 
 export default function LandingPage() {
   const featuredProjects = MOCK_PROJECTS.slice(0, 6);
@@ -18,14 +18,17 @@ export default function LandingPage() {
     { name: "Karan Gupta", college: "VIT Vellore", skill: "Data Analyst", completed: 7, earned: "₹35,000", text: "Helped startups make sense of their data. The platform's interface is seamless, and I love the direct communication with founders." }
   ];
 
+  const [activeStep, setActiveStep] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
+    if (isHovering) return;
     const timer = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % successStories.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, [successStories.length]);
+  }, [successStories.length, isHovering]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -82,38 +85,61 @@ export default function LandingPage() {
       </section>
 
       {/* How it Works */}
-      <section className="py-24 px-4 bg-background overflow-hidden">
+      <section id="how-it-works" className="py-24 px-4 bg-background overflow-hidden">
         <div className="container mx-auto max-w-5xl">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">How ProjectNest Works</h2>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">How ProjectBridge Works</h2>
             <p className="text-lg text-muted-foreground">Four simple steps to jumpstart your freelance career.</p>
           </div>
           
-          <div className="relative">
+          <div className="relative mb-12">
             {/* Timeline line */}
             <div className="hidden md:block absolute top-[45px] left-[10%] right-[10%] h-1 bg-gradient-to-r from-primary/10 via-primary/40 to-primary/10 -z-10" />
             
-            <div className="grid md:grid-cols-4 gap-12 md:gap-6 relative">
+            <div className="grid md:grid-cols-4 gap-8 md:gap-6 relative">
               {[
-                { title: "Create Profile", icon: User, desc: "Showcase your skills, portfolio, and education.", step: "1" },
-                { title: "Browse Projects", icon: Briefcase, desc: "Search and filter projects that match your skills.", step: "2" },
-                { title: "Apply & Get Hired", icon: CheckCircle2, desc: "Submit proposals and interview with clients.", step: "3" },
-                { title: "Complete & Earn", icon: TrendingUp, desc: "Deliver high-quality work and get paid securely.", step: "4" }
+                { title: "Create Student Profile", icon: User, step: "1" },
+                { title: "Browse Projects", icon: Briefcase, step: "2" },
+                { title: "Apply & Connect", icon: CheckCircle2, step: "3" },
+                { title: "Complete Work & Earn", icon: TrendingUp, step: "4" }
               ].map((step, i) => (
-                <div key={i} className="flex flex-col items-center text-center group cursor-default">
+                <div 
+                  key={i} 
+                  className={`flex flex-col items-center text-center group cursor-pointer transition-all duration-300 ${activeStep === i ? 'scale-105' : 'hover:scale-105 opacity-70 hover:opacity-100'}`}
+                  onClick={() => setActiveStep(i)}
+                >
                   <div className="relative mb-6">
-                    <div className="h-24 w-24 rounded-full bg-background border-4 border-muted/50 flex items-center justify-center shadow-sm group-hover:border-primary group-hover:shadow-primary/20 group-hover:-translate-y-2 transition-all duration-300 relative z-10">
-                      <step.icon className="h-10 w-10 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+                    <div className={`h-24 w-24 rounded-full bg-background border-4 flex items-center justify-center shadow-sm transition-all duration-300 relative z-10 ${activeStep === i ? 'border-primary shadow-primary/20 -translate-y-2' : 'border-muted/50'}`}>
+                      <step.icon className={`h-10 w-10 transition-colors duration-300 ${activeStep === i ? 'text-primary' : 'text-muted-foreground'}`} />
                     </div>
-                    <div className="absolute -top-3 -right-3 h-8 w-8 rounded-full bg-primary text-primary-foreground font-bold flex items-center justify-center text-sm shadow-md group-hover:scale-110 transition-transform duration-300 z-20">
+                    <div className={`absolute -top-3 -right-3 h-8 w-8 rounded-full font-bold flex items-center justify-center text-sm shadow-md transition-all duration-300 z-20 ${activeStep === i ? 'bg-primary text-primary-foreground scale-110' : 'bg-muted text-muted-foreground'}`}>
                       {step.step}
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors duration-300">{step.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed max-w-[200px]">{step.desc}</p>
+                  <h3 className={`text-xl font-bold mb-3 transition-colors duration-300 ${activeStep === i ? 'text-primary' : ''}`}>{step.title}</h3>
                 </div>
               ))}
             </div>
+          </div>
+          
+          {/* Active Step Details */}
+          <div className="max-w-2xl mx-auto bg-muted/20 p-8 rounded-2xl border text-center animate-in fade-in zoom-in duration-500 shadow-sm" key={activeStep}>
+            <h3 className="text-2xl font-bold mb-4 text-foreground">
+              Step {activeStep + 1}: {[
+                "Create Student Profile",
+                "Browse Projects",
+                "Apply & Connect",
+                "Complete Work & Earn"
+              ][activeStep]}
+            </h3>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              {[
+                "Students create a profile, add skills, upload portfolio projects and showcase their abilities.",
+                "Students explore available projects posted by businesses and startups.",
+                "Students apply to projects and communicate directly with businesses.",
+                "Students complete projects, build experience and earn money."
+              ][activeStep]}
+            </p>
           </div>
         </div>
       </section>
@@ -166,14 +192,33 @@ export default function LandingPage() {
       </section>
 
       {/* Success Stories */}
-      <section className="py-24 px-4 bg-background">
+      <section id="success-stories" className="py-24 px-4 bg-background">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Student Success Stories</h2>
             <p className="text-lg text-muted-foreground">Hear from students who kickstarted their careers here.</p>
           </div>
 
-          <div className="relative max-w-4xl mx-auto overflow-hidden rounded-2xl bg-muted/10 p-6 md:p-12 shadow-inner border">
+          <div 
+            className="relative max-w-4xl mx-auto overflow-hidden rounded-2xl bg-muted/10 p-6 md:p-12 shadow-inner border group"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+          >
+            <button 
+              className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/90 shadow-md border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-background"
+              onClick={() => setCurrentTestimonial(prev => prev === 0 ? successStories.length - 1 : prev - 1)}
+              aria-label="Previous story"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button 
+              className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/90 shadow-md border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-background"
+              onClick={() => setCurrentTestimonial(prev => (prev + 1) % successStories.length)}
+              aria-label="Next story"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+
             <div 
               className="flex transition-transform duration-500 ease-in-out" 
               style={{ transform: `translateX(-${currentTestimonial * 100}%)` }}

@@ -18,6 +18,7 @@ export interface User {
   email: string;
   password?: string;
   avatar?: string;
+  coverImage?: string;
   college?: string;
   company?: string;
   bio?: string;

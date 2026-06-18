@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useAppContext } from "@/context/AppContext"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -7,12 +7,31 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Mail, MapPin, Briefcase, Link as LinkIcon, Camera, Edit2, Save, X, Globe } from "lucide-react"
+import { Mail, MapPin, Briefcase, Link as LinkIcon, Camera, Edit2, Save, X, Globe, User } from "lucide-react"
 import { toast } from "sonner"
 
 export default function StudentProfile() {
   const { currentUser, setCurrentUser } = useAppContext()
   const [isEditing, setIsEditing] = useState(false)
+  
+  const coverInputRef = useRef<HTMLInputElement>(null)
+  const profileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'cover' | 'avatar') => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64String = reader.result as string
+        setCurrentUser({
+          ...currentUser!,
+          [type === 'cover' ? 'coverImage' : 'avatar']: base64String
+        })
+        toast.success(`${type === 'cover' ? 'Cover' : 'Profile'} image updated!`)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
   
   // Form State
   const [formData, setFormData] = useState({
@@ -67,11 +86,35 @@ export default function StudentProfile() {
 
   return (
     <div className="space-y-6">
+      {/* Hidden File Inputs */}
+      <input 
+        type="file" 
+        accept="image/jpeg, image/png, image/webp" 
+        hidden 
+        ref={coverInputRef} 
+        onChange={(e) => handleImageUpload(e, 'cover')} 
+      />
+      <input 
+        type="file" 
+        accept="image/jpeg, image/png, image/webp" 
+        hidden 
+        ref={profileInputRef} 
+        onChange={(e) => handleImageUpload(e, 'avatar')} 
+      />
+
       {/* Profile Header */}
       <Card className="overflow-hidden">
-        <div className="h-32 bg-gradient-to-r from-primary/80 to-primary/40 relative">
+        <div 
+          className="h-32 bg-gradient-to-r from-primary/80 to-primary/40 relative bg-cover bg-center"
+          style={currentUser.coverImage ? { backgroundImage: `url(${currentUser.coverImage})` } : {}}
+        >
           {isEditing && (
-            <Button variant="secondary" size="sm" className="absolute top-4 right-4">
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className="absolute top-4 right-4"
+              onClick={() => coverInputRef.current?.click()}
+            >
               <Camera className="h-4 w-4 mr-2" /> Change Cover
             </Button>
           )}
@@ -80,11 +123,16 @@ export default function StudentProfile() {
           <div className="flex flex-col sm:flex-row gap-6 -mt-12 sm:-mt-16 items-center sm:items-end text-center sm:text-left">
             <div className="relative">
               <Avatar className="h-24 w-24 sm:h-32 sm:w-32 border-4 border-background shadow-lg bg-background">
-                <AvatarImage src={currentUser.avatar || `https://ui-avatars.com/api/?name=${currentUser.name}`} />
-                <AvatarFallback className="text-4xl">{currentUser.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={currentUser.avatar || ''} className="object-cover" />
+                <AvatarFallback className="bg-muted">
+                  <User className="h-12 w-12 text-muted-foreground" />
+                </AvatarFallback>
               </Avatar>
               {isEditing && (
-                <button className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full shadow-md hover:bg-primary/90 transition-colors">
+                <button 
+                  className="absolute bottom-0 right-0 p-2 bg-primary text-primary-foreground rounded-full shadow-md hover:bg-primary/90 transition-colors"
+                  onClick={() => profileInputRef.current?.click()}
+                >
                   <Camera className="h-4 w-4" />
                 </button>
               )}
