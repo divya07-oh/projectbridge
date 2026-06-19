@@ -1,9 +1,13 @@
+import { useState } from "react"
 import { useParams, Link } from "react-router-dom"
+import { useAppContext } from "@/context/AppContext"
 import { MOCK_PROJECTS } from "@/data/mockData"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { toast } from "sonner"
+import ApplicationModal from "@/components/projects/ApplicationModal"
 import { 
   ArrowLeft, 
   Bookmark, 
@@ -18,7 +22,32 @@ import {
 
 export default function ProjectDetailPage() {
   const { id } = useParams()
+  const { applications, setApplications } = useAppContext()
   const project = MOCK_PROJECTS.find(p => p.id === id) || MOCK_PROJECTS[0]
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const openApplyModal = () => {
+    const hasApplied = applications.some(a => a.projectTitle === project.title)
+    if (hasApplied) {
+      toast.error("You have already applied to this project!")
+      return
+    }
+    setIsModalOpen(true)
+  }
+
+  const handleApplySubmit = (data: { proposal: string; estimatedDuration: string; budget: number }) => {
+    setApplications([
+      ...applications,
+      {
+        id: `app${Date.now()}`,
+        projectTitle: project.title,
+        company: project.company,
+        status: 'Pending',
+        appliedOn: new Date().toISOString().split('T')[0]
+      }
+    ])
+    toast.success("Application submitted successfully!")
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -87,7 +116,7 @@ export default function ProjectDetailPage() {
               <div className="text-3xl font-bold text-primary mb-1">{project.budget}</div>
               <p className="text-sm text-muted-foreground mb-6">Fixed Price</p>
               
-              <Button className="w-full h-12 text-lg mb-3 shadow-md shadow-primary/20">Apply Now</Button>
+              <Button className="w-full h-12 text-lg mb-3 shadow-md shadow-primary/20" onClick={openApplyModal}>Apply Now</Button>
               <div className="flex gap-3 mb-6">
                 <Button variant="outline" className="flex-1"><Bookmark className="mr-2 h-4 w-4" /> Save</Button>
                 <Button variant="outline" className="flex-1"><Share2 className="mr-2 h-4 w-4" /> Share</Button>
@@ -119,6 +148,14 @@ export default function ProjectDetailPage() {
           </Card>
         </div>
       </div>
+      
+      <ApplicationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        projectTitle={project.title}
+        company={project.company}
+        onSubmit={handleApplySubmit}
+      />
     </div>
   )
 }

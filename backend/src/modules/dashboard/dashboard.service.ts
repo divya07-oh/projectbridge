@@ -18,10 +18,11 @@ export const dashboardService = {
 
   getBusinessDashboard: async (businessId: string) => {
     return {
-      projectsPosted: 5,
-      activeProjects: 3,
-      totalApplicants: 42,
-      moneySpent: 120000,
+      projectsPosted: 12,
+      activeProjects: 2,
+      totalApplicants: 148,
+      moneySpent: 45500,
+      completionRate: 95,
       rating: 4.5
     };
   }

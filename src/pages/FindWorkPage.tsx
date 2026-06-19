@@ -8,6 +8,7 @@ import { Search, MapPin, Clock, DollarSign, Bookmark, BookmarkCheck } from "luci
 import { toast } from "sonner"
 import LoadingSkeleton from "@/components/shared/LoadingSkeleton"
 import EmptyState from "@/components/shared/EmptyState"
+import ApplicationModal from "@/components/projects/ApplicationModal"
 import {
   Select,
   SelectContent,
@@ -22,6 +23,8 @@ export default function FindWorkPage() {
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [isLoading, setIsLoading] = useState(true)
   const [savedProjects, setSavedProjects] = useState<string[]>([])
+  const [selectedProject, setSelectedProject] = useState<any | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Simulate network loading
   useEffect(() => {
@@ -42,19 +45,25 @@ export default function FindWorkPage() {
     return matchesSearch && matchesCategory;
   })
 
-  const handleApply = (project: any) => {
+  const openApplyModal = (project: any) => {
     const hasApplied = applications.some(a => a.projectTitle === project.title)
     if (hasApplied) {
       toast.error("You have already applied to this project!")
       return
     }
+    setSelectedProject(project)
+    setIsModalOpen(true)
+  }
+
+  const handleApplySubmit = (data: { proposal: string; estimatedDuration: string; budget: number }) => {
+    if (!selectedProject) return
 
     setApplications([
       ...applications,
       {
         id: `app${Date.now()}`,
-        projectTitle: project.title,
-        company: project.company,
+        projectTitle: selectedProject.title,
+        company: selectedProject.company,
         status: 'Pending',
         appliedOn: new Date().toISOString().split('T')[0]
       }
@@ -173,11 +182,21 @@ export default function FindWorkPage() {
               </CardContent>
               <CardFooter className="border-t pt-4 bg-muted/10 gap-3">
                 <Button variant="outline" className="flex-1">View Details</Button>
-                <Button className="flex-1" onClick={() => handleApply(project)}>Apply Now</Button>
+                <Button className="flex-1" onClick={() => openApplyModal(project)}>Apply Now</Button>
               </CardFooter>
             </Card>
           ))}
         </div>
+      )}
+      
+      {selectedProject && (
+        <ApplicationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          projectTitle={selectedProject.title}
+          company={selectedProject.company}
+          onSubmit={handleApplySubmit}
+        />
       )}
     </div>
   )
